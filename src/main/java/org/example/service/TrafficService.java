@@ -1,8 +1,8 @@
 package org.example.service;
 
+import org.example.integration.RemoteEndpoint;
 import org.example.model.Config;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -13,7 +13,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class TrafficService {
     private Config config;
     private final AtomicBoolean sendTraffic = new AtomicBoolean(false);
-    private final RestTemplate restTemplate = new RestTemplate();
     private ScheduledExecutorService scheduler;
 
     public synchronized void updateConfig(Config config) {
@@ -42,7 +41,10 @@ public class TrafficService {
             scheduler = Executors.newSingleThreadScheduledExecutor();
             scheduler.scheduleAtFixedRate(() -> {
                 System.out.println("Sending a request to " + config.getUrl());
-                // restTemplate.getForObject(config.getUrl(), String.class); Uncomment to send actual request
+                RemoteEndpoint.EndpointCallResult result = RemoteEndpoint.call(config.getUrl());
+                if (result.statusCode() != 200) {
+                    System.out.println("Status code " + result.statusCode() + " observed!");
+                }
             }, 0, 1, TimeUnit.SECONDS); // Adjust the third argument based on your rate logic
         }
     }
