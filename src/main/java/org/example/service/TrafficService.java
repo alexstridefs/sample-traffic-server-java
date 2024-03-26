@@ -6,9 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -17,6 +15,9 @@ public class TrafficService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TrafficService.class);
     private Config config = null;
     private ScheduledExecutorService scheduler;
+
+    private long lastCallTimeEpochMillis = 0;
+    private Thread trafficThread = null;
 
     public synchronized void updateConfig(Config newConfig) {
         boolean previousConfigPresent = config != null;
@@ -28,7 +29,6 @@ public class TrafficService {
         } else {
             startTraffic();
         }
-
     }
 
     public synchronized void deleteConfig() {
@@ -43,22 +43,33 @@ public class TrafficService {
     private void startTraffic() {
         if (config != null) {
             if (config.getCallsPerSecond() > 0) {
-                scheduler = Executors.newSingleThreadScheduledExecutor();
-                scheduler.scheduleAtFixedRate(() -> {
-                    LOGGER.info("Sending a request to " + config.getUrl());
-                    RemoteEndpoint.EndpointCallResult result = RemoteEndpoint.call(config.getUrl());
-                    if (result.statusCode() != 200) {
-                        System.out.println("Status code " + result.statusCode() + " observed!");
+                long timeBetweenCalls = 1000 / config.getCallsPerSecond();
+                trafficThread = new Thread(() -> {
+                    while (true) {
+                        long currentTime = System.currentTimeMillis();
+                        long waitTime = currentTime - lastCallTimeEpochMillis + timeBetweenCalls;
+                        if (waitTime > 0) {
+                            try {
+                                Thread.sleep(waitTime);
+                            } catch (InterruptedException ex) {
+                                LOGGER.info("Interrupted!");
+                            }
+                        }
+                        lastCallTimeEpochMillis = System.currentTimeMillis();
+                        RemoteEndpoint.EndpointCallResult result = RemoteEndpoint.call(config.getUrl());
+                        if (result.statusCode() != 200) {
+                            System.out.println("Status code " + result.statusCode() + " observed!");
+                        }
                     }
-                }, 0, 1000 / config.getCallsPerSecond(), TimeUnit.MILLISECONDS);
+                });
             }
         }
     }
 
     private void stopTraffic() {
-        if (scheduler != null) {
-            scheduler.shutdownNow();
-            scheduler = null;
+        if (trafficThread != null) {
+            trafficThread.interrupt();
+            trafficThread = null;
         }
     }
 }
