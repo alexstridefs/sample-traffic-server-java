@@ -62,6 +62,7 @@ public class TrafficService {
                         }
                     }
                 });
+                trafficThread.start();
             }
         }
     }
