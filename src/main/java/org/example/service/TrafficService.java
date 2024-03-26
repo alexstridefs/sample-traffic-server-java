@@ -2,6 +2,8 @@ package org.example.service;
 
 import org.example.integration.RemoteEndpoint;
 import org.example.model.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.Executors;
@@ -11,6 +13,8 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class TrafficService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrafficService.class);
     private Config config = null;
     private ScheduledExecutorService scheduler;
 
@@ -41,7 +45,7 @@ public class TrafficService {
             if (config.getCallsPerSecond() > 0) {
                 scheduler = Executors.newSingleThreadScheduledExecutor();
                 scheduler.scheduleAtFixedRate(() -> {
-                    System.out.println("Sending a request to " + config.getUrl());
+                    LOGGER.info("Sending a request to " + config.getUrl());
                     RemoteEndpoint.EndpointCallResult result = RemoteEndpoint.call(config.getUrl());
                     if (result.statusCode() != 200) {
                         System.out.println("Status code " + result.statusCode() + " observed!");

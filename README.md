@@ -1,6 +1,6 @@
-# My Service API Documentation
+# TestAgentApplication API Documentation
 
-Welcome to the API documentation for My Service. This service allows you to configure a server to send traffic to a specified URL at a configurable rate. You can start, stop, and modify this traffic through our RESTful API.
+Welcome to the API documentation for the TestAgentAppication. This service allows you to configure a server to send traffic to a specified URL at a configurable rate. You can start, stop, and modify this traffic through our RESTful API.
 
 ## Base URL
 
@@ -19,14 +19,14 @@ Updates the configuration for sending traffic and starts sending traffic to the 
 #### Request Body
 
 - `url` (string): The URL to which the server will send traffic.
-- `rate` (integer): The rate at which traffic will be sent, in requests per second.
+- `callsPerSecond` (integer): The rate at which traffic will be sent, in requests per second.
 
 ##### Example
 
 ```json
 {
   "url": "https://example.com/api/target",
-  "rate": 1
+  "callsPerSecond": 1
 }
 ```
 
@@ -47,7 +47,7 @@ Example Response
 ```
 {
 "url": "https://example.com/api/target",
-"rate": 1
+"callsPerSecond": 1
 }
 ```
 
@@ -61,3 +61,11 @@ Error Handling
 400 Bad Request: The server could not understand the request due to invalid syntax.
 404 Not Found: The requested resource was not found.
 500 Internal Server Error: The server encountered an unexpected condition.
+
+# Sample cURL requests
+
+Start traffic:
+
+```
+curl -X POST -H "Content-Type: application/json" http://localhost:8080/config -d '{"url": "http://whatever/foo", "callsPerSecond": 1}'
+```
