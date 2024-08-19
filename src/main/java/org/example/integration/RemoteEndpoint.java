@@ -9,18 +9,14 @@ public class RemoteEndpoint {
     public record EndpointCallResult(int statusCode) {
     }
 
-    public static EndpointCallResult call(String url) {
+    public static EndpointCallResult call(String url) throws InterruptedException {
         // Dummy implementation simulating behaviour of remote service
-        try {
-            if (RNG.nextInt(100) == 0) {
-                Thread.sleep(RNG.nextInt(1000));
-                return new EndpointCallResult(500);
-            } else {
-                Thread.sleep(RNG.nextInt(20));
-                return new EndpointCallResult(200);
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        if (RNG.nextInt(100) == 0) {
+            Thread.sleep(RNG.nextInt(1000));
+            return new EndpointCallResult(500);
+        } else {
+            Thread.sleep(RNG.nextInt(20));
+            return new EndpointCallResult(200);
         }
     }
 }

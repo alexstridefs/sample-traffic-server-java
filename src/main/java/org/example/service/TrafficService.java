@@ -45,23 +45,26 @@ public class TrafficService {
             if (config.getCallsPerSecond() > 0) {
                 long timeBetweenCalls = 1000 / config.getCallsPerSecond();
                 trafficThread = new Thread(() -> {
-                    while (true) {
-                        long currentTime = System.currentTimeMillis();
-                        long waitTime = currentTime - lastCallTimeEpochMillis + timeBetweenCalls;
-                        if (waitTime > 0) {
-                            try {
+                    try {
+                        while (true) {
+                            long currentTime = System.currentTimeMillis();
+                            long waitTime = lastCallTimeEpochMillis + timeBetweenCalls - currentTime;
+                            if (waitTime > 0) {
                                 Thread.sleep(waitTime);
-                            } catch (InterruptedException ex) {
-                                LOGGER.info("Interrupted!");
+                            }
+                            lastCallTimeEpochMillis = System.currentTimeMillis();
+                            LOGGER.info("Calling url: " + config.getUrl());
+                            RemoteEndpoint.EndpointCallResult result = RemoteEndpoint.call(config.getUrl());
+                            if (result.statusCode() != 200) {
+                                System.out.println("Status code " + result.statusCode() + " observed!");
                             }
                         }
-                        lastCallTimeEpochMillis = System.currentTimeMillis();
-                        RemoteEndpoint.EndpointCallResult result = RemoteEndpoint.call(config.getUrl());
-                        if (result.statusCode() != 200) {
-                            System.out.println("Status code " + result.statusCode() + " observed!");
-                        }
+                    } catch (InterruptedException ignored) {
                     }
+                    LOGGER.info("Traffic stopped");
+
                 });
+                LOGGER.info("Starting traffic");
                 trafficThread.start();
             }
         }

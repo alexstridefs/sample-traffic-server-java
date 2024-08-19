@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="f62dbcf5-da8d-41be-ac51-06481a754cae" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/integration/RemoteEndpoint.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/integration/RemoteEndpoint.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/service/TrafficService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/service/TrafficService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -94,5 +95,15 @@
       <updated>1710874870292</updated>
     </task>
     <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.InterruptedException" package="java.lang" />
+          <option name="timeStamp" value="5" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
